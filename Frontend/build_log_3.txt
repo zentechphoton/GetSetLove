@@ -1,0 +1,33 @@
+
+> gsl-frontend@0.1.0 build
+> next build
+
+   ▲ Next.js 14.0.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./app/cookies/page.tsx:215:17
+Type error: Type '{ hidden: { opacity: number; y: number; }; visible: { opacity: number; y: number; transition: { duration: number; ease: string; }; }; }' is not assignable to type 'Variants'.
+  Property 'visible' is incompatible with index signature.
+    Type '{ opacity: number; y: number; transition: { duration: number; ease: string; }; }' is not assignable to type 'Variant'.
+      Type '{ opacity: number; y: number; transition: { duration: number; ease: string; }; }' is not assignable to type 'TargetAndTransition'.
+        Type '{ opacity: number; y: number; transition: { duration: number; ease: string; }; }' is not assignable to type '{ transition?: Transition<any>; transitionEnd?: ResolvedValues; }'.
+          Types of property 'transition' are incompatible.
+            Type '{ duration: number; ease: string; }' is not assignable to type 'Transition<any>'.
+              Type '{ duration: number; ease: string; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                Type '{ duration: number; ease: string; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                  Types of property 'ease' are incompatible.
+                    Type 'string' is not assignable to type 'Easing | Easing[]'.
+
+[0m [90m 213 |[39m               [33m<[39m[33mmotion[39m[33m.[39mdiv[0m
+[0m [90m 214 |[39m                 key[33m=[39m{index}[0m
+[0m[31m[1m>[22m[39m[90m 215 |[39m                 variants[33m=[39m{itemVariants}[0m
+[0m [90m     |[39m                 [31m[1m^[22m[39m[0m
+[0m [90m 216 |[39m                 whileHover[33m=[39m{{ y[33m:[39m [33m-[39m[35m10[39m[33m,[39m scale[33m:[39m [35m1.02[39m }}[0m
+[0m [90m 217 |[39m                 className[33m=[39m[32m"p-6 md:p-8 rounded-2xl relative overflow-hidden group"[39m[0m
+[0m [90m 218 |[39m                 style[33m=[39m{{[0m

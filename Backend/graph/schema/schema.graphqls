@@ -1,0 +1,237 @@
+# GraphQL schema for GSL Backend
+
+scalar Time
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  first_name: String
+  last_name: String
+  avatar: String
+  role: String!
+  is_verified: Boolean!
+  is_premium: Boolean!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
+input RegisterInput {
+  username: String!
+  email: String!
+  password: String!
+  first_name: String
+  last_name: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+scalar JSON
+
+# ========== CHAT TYPES ==========
+
+type Chat {
+  id: ID!
+  type: String!
+  participants: [ChatParticipant!]!
+  lastMessage: Message
+  lastMessageAt: Time
+  createdAt: Time!
+  metadata: JSON
+}
+
+type ChatParticipant {
+  id: ID!
+  user: User!
+  role: String!
+  joinedAt: Time!
+  leftAt: Time
+  muted: Boolean!
+  archived: Boolean!
+  lastReadMessageID: ID
+  lastReadAt: Time
+  unreadCount: Int!
+}
+
+type Message {
+  id: ID!
+  chatID: ID!
+  senderID: ID!
+  sender: User!
+  content: String
+  mediaType: String
+  mediaURL: String
+  mediaMetadata: JSON
+  replyTo: Message
+  messageType: String!
+  status: String!
+  createdAt: Time!
+  updatedAt: Time
+  sequenceNumber: Int!
+  isFlagged: Boolean!
+  metadata: JSON
+}
+
+type TypingEvent {
+  chatID: ID!
+  userID: ID!
+  typing: Boolean!
+  timestamp: Time!
+}
+
+type PresenceEvent {
+  userID: ID!
+  online: Boolean!
+  lastSeen: Time
+}
+
+# ========== MATCHING TYPES ==========
+
+type Match {
+  id: ID!
+  matchedUser: User!
+  matchScore: Float
+  matchReason: String
+  matchedAt: Time!
+  status: String!
+  chatID: ID
+  chat: Chat
+  firstMessageAt: Time
+}
+
+type MatchSuggestion {
+  user: User!
+  score: Float!
+  scoreBreakdown: JSON
+  reason: String
+  rank: Int
+}
+
+type LikeResult {
+  success: Boolean!
+  matched: Boolean!
+  match: Match
+}
+
+type UserPreferences {
+  userID: ID!
+  minAge: Int!
+  maxAge: Int!
+  maxDistanceKm: Int!
+  genderPreference: [String!]!
+  relationshipGoals: [String!]
+  interests: [String!]
+  dealbreakers: [String!]
+  verifiedOnly: Boolean!
+  premiumOnly: Boolean!
+}
+
+type MatchStatistics {
+  totalMatches: Int!
+  activeMatches: Int!
+  totalLikes: Int!
+  totalLikesReceived: Int!
+  matchRate: Float!
+}
+
+# ========== QUERIES ==========
+
+type Query {
+  # Auth
+  me: User
+
+  # Chat queries
+  chat(id: ID!): Chat
+  myChats(limit: Int = 20, offset: Int = 0): [Chat!]!
+  chatMessages(chatID: ID!, limit: Int = 50, before: ID): [Message!]!
+  chatParticipants(chatID: ID!): [ChatParticipant!]!
+
+  # Match queries
+  myMatches(limit: Int = 20, status: String = "active"): [Match!]!
+  matchSuggestions(limit: Int = 10): [MatchSuggestion!]!
+  matchStatistics: MatchStatistics!
+
+  # User preferences
+  myPreferences: UserPreferences
+}
+
+# ========== MUTATIONS ==========
+
+enum LikeType {
+  LIKE
+  SUPERLIKE
+  PASS
+}
+
+input PreferencesInput {
+  minAge: Int
+  maxAge: Int
+  maxDistanceKm: Int
+  genderPreference: [String!]
+  relationshipGoals: [String!]
+  interests: [String!]
+  dealbreakers: [String!]
+  verifiedOnly: Boolean
+  premiumOnly: Boolean
+}
+
+type Mutation {
+  # Auth
+  register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
+  logout: Boolean!
+
+  # Chat mutations
+  createDMChat(participantID: ID!): Chat!
+  markMessagesRead(chatID: ID!, messageIDs: [ID!]!): Boolean!
+  archiveChat(chatID: ID!, archived: Boolean!): Boolean!
+  muteChat(chatID: ID!, muted: Boolean!): Boolean!
+  deleteMessage(messageID: ID!): Boolean!
+
+  # Matching mutations
+  likeUser(userID: ID!, type: LikeType = LIKE): LikeResult!
+  unmatch(matchID: ID!): Boolean!
+  reportUser(userID: ID!, reason: String!): Boolean!
+  refreshSuggestions: [MatchSuggestion!]!
+
+  # Preferences
+  updatePreferences(input: PreferencesInput!): UserPreferences!
+}
+
+# ========== SUBSCRIPTIONS ==========
+
+type Subscription {
+  # Typing & presence
+  chatTyping(chatID: ID!): TypingEvent!
+  userPresence(userID: ID!): PresenceEvent!
+
+  # Match notifications
+  newMatch: Match!
+  newLike: LikeNotification!
+
+  # System notifications
+  systemNotification: Notification!
+}
+
+type LikeNotification {
+  fromUser: User!
+  timestamp: Time!
+}
+
+type Notification {
+  id: ID!
+  type: String!
+  title: String!
+  body: String!
+  data: JSON
+  createdAt: Time!
+}
+

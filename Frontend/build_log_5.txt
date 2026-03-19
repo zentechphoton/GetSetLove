@@ -1,0 +1,23 @@
+
+> gsl-frontend@0.1.0 build
+> next build
+
+   ▲ Next.js 14.0.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./components/Chat/ChatMessageInput.tsx:89:13
+Type error: Object literal may only specify known properties, and 'focusRingColor' does not exist in type 'Properties<string | number, string & {}>'.
+
+[0m [90m 87 |[39m             color[33m:[39m [32m'var(--chat-text)'[39m[33m,[39m[0m
+[0m [90m 88 |[39m             maxHeight[33m:[39m [32m'120px'[39m[33m,[39m[0m
+[0m[31m[1m>[22m[39m[90m 89 |[39m             focusRingColor[33m:[39m [32m'var(--chat-primary)'[39m[33m,[39m[0m
+[0m [90m    |[39m             [31m[1m^[22m[39m[0m
+[0m [90m 90 |[39m           }}[0m
+[0m [90m 91 |[39m         [33m/[39m[33m>[39m[0m
+[0m [90m 92 |[39m       [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m[0m

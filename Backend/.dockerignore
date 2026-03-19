@@ -1,0 +1,7 @@
+.git
+node_modules
+Frontend
+dist
+tmp
+.env
+*.log

@@ -1,0 +1,23 @@
+
+> gsl-frontend@0.1.0 build
+> next build
+
+   ▲ Next.js 14.0.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./components/Chat/ThemeSelector.tsx:121:19
+Type error: Object literal may only specify known properties, and 'ringColor' does not exist in type 'Properties<string | number, string & {}>'.
+
+[0m [90m 119 |[39m                   backgroundColor[33m:[39m theme[33m.[39mcolors[33m.[39mbackground[33m,[39m[0m
+[0m [90m 120 |[39m                   borderColor[33m:[39m currentTheme [33m===[39m theme[33m.[39mkey [33m?[39m theme[33m.[39mcolors[33m.[39mprimary [33m:[39m theme[33m.[39mcolors[33m.[39mborder[33m,[39m[0m
+[0m[31m[1m>[22m[39m[90m 121 |[39m                   ringColor[33m:[39m currentTheme [33m===[39m theme[33m.[39mkey [33m?[39m theme[33m.[39mcolors[33m.[39mprimary [33m:[39m [32m'transparent'[39m[33m,[39m[0m
+[0m [90m     |[39m                   [31m[1m^[22m[39m[0m
+[0m [90m 122 |[39m                 }}[0m
+[0m [90m 123 |[39m               [33m>[39m[0m
+[0m [90m 124 |[39m                 {[90m/* Color Swatch Triangle - Top Left - Smaller */[39m}[0m

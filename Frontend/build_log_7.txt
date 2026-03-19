@@ -1,0 +1,72 @@
+
+> gsl-frontend@0.1.0 build
+> next build
+
+   ▲ Next.js 14.0.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/35) ...
+   Generating static pages (8/35) 
+   Generating static pages (17/35) 
+   Generating static pages (26/35) 
+ ✓ Generating static pages (35/35) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    8.8 kB          158 kB
+├ ○ /_not-found                          872 B          82.8 kB
+├ ○ /accessibility                       6.23 kB         132 kB
+├ ○ /admin/blogs                         8.87 kB         173 kB
+├ λ /admin/blogs/[id]/edit               4.49 kB         177 kB
+├ ○ /admin/blogs/new                     4.72 kB         177 kB
+├ ○ /admin/dashboard                     4.42 kB         163 kB
+├ ○ /admin/matches                       9.78 kB         174 kB
+├ ○ /admin/news                          8.55 kB         173 kB
+├ λ /admin/news/[id]/edit                4.48 kB         177 kB
+├ ○ /admin/news/new                      4.7 kB          177 kB
+├ ○ /admin/profile                       8.92 kB         168 kB
+├ ○ /admin/users                         11.1 kB         175 kB
+├ ○ /admin/verifications                 10.4 kB         174 kB
+├ ○ /auth/login                          2.18 kB         143 kB
+├ ○ /auth/register                       3.03 kB         144 kB
+├ ○ /chat                                20.9 kB         132 kB
+├ ○ /contact                             12.5 kB         131 kB
+├ ○ /cookies                             5.75 kB         131 kB
+├ ○ /dashboard                           4.15 kB         163 kB
+├ ○ /faq                                 11.6 kB         137 kB
+├ ○ /guidelines                          6.95 kB         132 kB
+├ ○ /help                                7.13 kB         132 kB
+├ ○ /how-it-works                        8.58 kB         134 kB
+├ ○ /matches                             4.31 kB         163 kB
+├ ○ /news                                3.25 kB         155 kB
+├ λ /news/[slug]                         3.08 kB         155 kB
+├ ○ /privacy                             5.8 kB          131 kB
+├ ○ /profile                             11.5 kB         170 kB
+├ ○ /resources/blog                      3.73 kB         156 kB
+├ λ /resources/blog/[slug]               4.06 kB         156 kB
+├ ○ /resources/news                      4.71 kB         157 kB
+├ λ /resources/news/[slug]               4.23 kB         156 kB
+├ ○ /safety                              6.88 kB         132 kB
+├ ○ /settings                            10.1 kB         150 kB
+├ ○ /terms                               5.98 kB         131 kB
+├ ○ /user/blogs                          7.47 kB         172 kB
+├ λ /user/blogs/[id]/edit                4.09 kB         176 kB
+└ ○ /user/blogs/new                      4.19 kB         176 kB
++ First Load JS shared by all            81.9 kB
+  ├ chunks/4938-cfc2f709f4801005.js      26.7 kB
+  ├ chunks/fd9d1056-f8b07f93a9253f12.js  53.3 kB
+  ├ chunks/main-app-48f167a80a3705db.js  223 B
+  └ chunks/webpack-58df252d3b24f2c0.js   1.74 kB
+
+
+ƒ Middleware                             40.7 kB
+
+○  (Static)   prerendered as static content
+λ  (Dynamic)  server-rendered on demand using Node.js
+

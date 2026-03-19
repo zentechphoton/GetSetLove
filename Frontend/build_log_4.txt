@@ -1,0 +1,23 @@
+
+> gsl-frontend@0.1.0 build
+> next build
+
+   ▲ Next.js 14.0.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./components/Chat/ChatAvatar.tsx:48:11
+Type error: Object literal may only specify known properties, and 'ringColor' does not exist in type 'Properties<string | number, string & {}>'.
+
+[0m [90m 46 |[39m [32m        }`[39m}[0m
+[0m [90m 47 |[39m         style[33m=[39m{{[0m
+[0m[31m[1m>[22m[39m[90m 48 |[39m           ringColor[33m:[39m online [33m?[39m [32m'var(--chat-online)'[39m [33m:[39m [32m'transparent'[39m[33m,[39m[0m
+[0m [90m    |[39m           [31m[1m^[22m[39m[0m
+[0m [90m 49 |[39m         }}[0m
+[0m [90m 50 |[39m       [33m>[39m[0m
+[0m [90m 51 |[39m         {avatarUrl [33m?[39m ([0m

@@ -1,0 +1,376 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { useAuthStore } from '@/store/authStore'
+import AdminSidebar from '@/components/Layout/AdminSidebar'
+import { SidebarProvider } from '@/components/Layout/SidebarContext'
+import { api } from '@/lib/api'
+import { brandColors } from '@/lib/colors'
+import toast from 'react-hot-toast'
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  DocumentTextIcon,
+  EyeIcon,
+  EyeSlashIcon,
+} from '@heroicons/react/24/outline'
+import { format } from 'date-fns'
+
+interface Blog {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  image: string
+  status: 'draft' | 'published'
+  author: {
+    first_name: string
+    last_name: string
+    username: string
+  }
+  created_at: string
+  updated_at: string
+}
+
+interface BlogStats {
+  total_blogs: number
+  published_blogs: number
+  draft_blogs: number
+}
+
+export default function AdminBlogsPage() {
+  const router = useRouter()
+  const { user, token, _hasHydrated } = useAuthStore()
+  const [blogs, setBlogs] = useState<Blog[]>([])
+  const [stats, setStats] = useState<BlogStats>({
+    total_blogs: 0,
+    published_blogs: 0,
+    draft_blogs: 0,
+  })
+  const [settings, setSettings] = useState({ user_blog_access: false })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!_hasHydrated) return
+    if (!token || !user || (user.role !== 'admin' && user.role !== 'super_admin')) {
+      router.push('/auth/login')
+      return
+    }
+    fetchData()
+  }, [token, user, _hasHydrated, router])
+
+  const fetchData = async () => {
+    try {
+      const [blogsRes, statsRes, settingsRes] = await Promise.all([
+        api.get('/admin/blogs'),
+        api.get('/admin/blogs/stats'),
+        api.get('/admin/blogs/settings'),
+      ])
+      setBlogs(blogsRes.data || [])
+      setStats(statsRes.data || {
+        total_blogs: 0,
+        published_blogs: 0,
+        draft_blogs: 0,
+      })
+      setSettings(settingsRes.data || { user_blog_access: false })
+    } catch (error: any) {
+      console.error('Error fetching data:', error)
+      console.error('Error response:', error.response)
+      console.error('Error status:', error.response?.status)
+      
+      if (error.response?.status === 401) {
+        toast.error('Authentication failed. Please login again.')
+        router.push('/auth/login')
+      } else if (error.response?.status === 403) {
+        toast.error('You do not have permission to access this page.')
+      } else {
+        const errorMsg = error.response?.data?.error || error.message || 'Failed to load blogs'
+        toast.error(errorMsg)
+      }
+      
+      // Set empty defaults on error
+      setBlogs([])
+      setStats({
+        total_blogs: 0,
+        published_blogs: 0,
+        draft_blogs: 0,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this blog?')) return
+
+    try {
+      await api.delete(`/admin/blogs/${id}`)
+      toast.success('Blog deleted successfully')
+      fetchData()
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to delete blog')
+    }
+  }
+
+  const handleToggleUserAccess = async () => {
+    try {
+      const newValue = !settings.user_blog_access
+      await api.put('/admin/blogs/settings', {
+        user_blog_access: newValue,
+      })
+      setSettings({ ...settings, user_blog_access: newValue })
+      toast.success(
+        newValue
+          ? 'User blog creation enabled'
+          : 'User blog creation disabled'
+      )
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to update settings')
+    }
+  }
+
+  if (loading) {
+    return (
+      <SidebarProvider>
+        <div className="flex min-h-screen">
+          <AdminSidebar />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+          </div>
+        </div>
+      </SidebarProvider>
+    )
+  }
+
+  return (
+    <SidebarProvider>
+      <div className="flex min-h-screen bg-gray-50 dark:bg-slate-900">
+        <AdminSidebar />
+        <div className="flex-1 lg:ml-64">
+          <div className="p-6 lg:p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-3xl font-bold" style={{ color: brandColors.primary.purple }}>
+                  Blog Management
+                </h1>
+                <Link href="/admin/blogs/new">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center space-x-2 px-4 py-2 text-white rounded-lg font-semibold"
+                    style={{ background: brandColors.gradients.primary }}
+                  >
+                    <PlusIcon className="h-5 w-5" />
+                    <span>New Blog</span>
+                  </motion.button>
+                </Link>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Blogs</p>
+                      <p className="text-3xl font-bold mt-2" style={{ color: brandColors.primary.purple }}>
+                        {stats.total_blogs}
+                      </p>
+                    </div>
+                    <DocumentTextIcon className="h-12 w-12 opacity-20" style={{ color: brandColors.primary.purple }} />
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Published</p>
+                      <p className="text-3xl font-bold mt-2" style={{ color: brandColors.additional.green }}>
+                        {stats.published_blogs}
+                      </p>
+                    </div>
+                    <EyeIcon className="h-12 w-12 opacity-20" style={{ color: brandColors.additional.green }} />
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Drafts</p>
+                      <p className="text-3xl font-bold mt-2" style={{ color: brandColors.additional.yellow }}>
+                        {stats.draft_blogs}
+                      </p>
+                    </div>
+                    <EyeSlashIcon className="h-12 w-12 opacity-20" style={{ color: brandColors.additional.yellow }} />
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* User Blog Access Toggle */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg mb-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      User Blog Access
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      Allow users to create and manage their own blogs
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleToggleUserAccess}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      settings.user_blog_access ? 'bg-purple-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        settings.user_blog_access ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Blogs Table */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-slate-700">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Title
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Author
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Created
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {blogs.map((blog, index) => (
+                      <motion.tr
+                        key={blog.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="hover:bg-gray-50 dark:hover:bg-slate-700"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {blog.image && (
+                              <img
+                                src={blog.image}
+                                alt={blog.title}
+                                className="h-12 w-12 rounded-lg object-cover mr-3"
+                              />
+                            )}
+                            <div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                {blog.title}
+                              </div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {blog.slug}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          {blog.author?.first_name || blog.author?.username || 'Unknown'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                              blog.status === 'published'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            }`}
+                          >
+                            {blog.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          {format(new Date(blog.created_at), 'MMM d, yyyy')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end space-x-2">
+                            <Link href={`/admin/blogs/${blog.id}/edit`}>
+                              <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+                              >
+                                <PencilIcon className="h-5 w-5" />
+                              </motion.button>
+                            </Link>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleDelete(blog.id)}
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                            >
+                              <TrashIcon className="h-5 w-5" />
+                            </motion.button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+                {blogs.length === 0 && (
+                  <div className="text-center py-12">
+                    <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">No blogs found</p>
+                    <Link href="/admin/blogs/new">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="mt-4 px-4 py-2 text-white rounded-lg font-semibold"
+                        style={{ background: brandColors.gradients.primary }}
+                      >
+                        Create Your First Blog
+                      </motion.button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SidebarProvider>
+  )
+}
+

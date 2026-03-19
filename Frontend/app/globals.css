@@ -1,0 +1,329 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 17, 24, 39;
+    --background-end-rgb: 17, 24, 39;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Dark mode styles */
+.dark body {
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Ensure proper styling */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  height: 100%;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Sidebar Custom Styles */
+@layer components {
+  /* Sidebar Scrollbar */
+  .sidebar-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.3);
+    border-radius: 10px;
+  }
+  
+  .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.5);
+  }
+  
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.3);
+  }
+  
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.5);
+  }
+
+  /* Sidebar Animation */
+  .sidebar-enter {
+    animation: sidebarSlideIn 0.3s ease-out;
+  }
+  
+  .sidebar-exit {
+    animation: sidebarSlideOut 0.3s ease-in;
+  }
+
+  /* Sidebar Item Hover Effect */
+  .sidebar-item {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .sidebar-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(135deg, #9d00ff 0%, #ff006e 100%);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+  }
+  
+  .sidebar-item:hover::before {
+    transform: scaleY(1);
+  }
+  
+  .sidebar-item.active::before {
+    transform: scaleY(1);
+  }
+
+  /* Sidebar Glass Effect */
+  .sidebar-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .dark .sidebar-glass {
+    background: rgba(15, 23, 42, 0.95);
+  }
+
+  /* Sidebar Badge Pulse */
+  @keyframes badgePulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+  
+  .sidebar-badge {
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+
+  /* Mobile Sidebar Backdrop */
+  .sidebar-backdrop {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Sidebar Gradient Border */
+  .sidebar-gradient-border {
+    position: relative;
+  }
+  
+  .sidebar-gradient-border::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, #9d00ff 0%, #ff006e 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .sidebar-gradient-border:hover::after {
+    opacity: 0.3;
+  }
+}
+
+@keyframes sidebarSlideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sidebarSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+/* Responsive Sidebar Adjustments */
+@media (max-width: 1023px) {
+  .sidebar-mobile {
+    width: min(320px, 85vw);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-mobile {
+    width: min(300px, 88vw);
+  }
+  
+  /* Better touch targets on mobile */
+  .sidebar-item {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar-mobile {
+    width: min(280px, 90vw);
+  }
+  
+  /* Smaller padding on very small screens */
+  .sidebar-mobile .p-6 {
+    padding: 1rem;
+  }
+  
+  .sidebar-mobile .p-4 {
+    padding: 0.75rem;
+  }
+}
+
+/* Better profile card click area */
+.sidebar-profile-card {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.sidebar-profile-card:active {
+  transform: scale(0.98);
+}
+
+/* Sidebar Collapse Animation */
+@keyframes collapseWidth {
+  from {
+    width: 288px;
+  }
+  to {
+    width: 80px;
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    width: 80px;
+  }
+  to {
+    width: 288px;
+  }
+}
+
+/* Content Area Responsive Padding */
+.sidebar-content {
+  transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure sidebar doesn't overlap content */
+@media (min-width: 768px) {
+  .sidebar-content-collapsed {
+    padding-left: 5rem; /* 80px - w-20 */
+  }
+  
+  .sidebar-content-expanded {
+    padding-left: 18rem; /* 288px - w-72 */
+  }
+}
+
+/* Hero Section Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Chat Theme CSS Variables */
+:root {
+  --chat-bg: #eafff2;
+  --chat-bg-secondary: #d1fae5;
+  --chat-primary: #059669;
+  --chat-primary-hover: #047857;
+  --chat-secondary: #10b981;
+  --chat-text: #064e3b;
+  --chat-text-secondary: #065f46;
+  --chat-border: #a7f3d0;
+  --chat-message-sent: #10b981;
+  --chat-message-received: #ffffff;
+  --chat-online: #10b981;
+  --chat-offline: #6b7280;
+  --chat-unread: #059669;
+  --chat-hover: #d1fae5;
+  --chat-active: #a7f3d0;
+}
+
+/* Chat Scrollbar */
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--chat-border);
+  border-radius: 10px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--chat-primary);
+}
